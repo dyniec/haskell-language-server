@@ -104,8 +104,35 @@
           shell-ghc98 = mkDevShell pkgs.haskell.packages.ghc98;
           shell-ghc910 = mkDevShell pkgs.haskell.packages.ghc910;
           shell-ghc912 = mkDevShell pkgs.haskell.packages.ghc912;
-          shell-ghc914 = mkDevShell pkgs.haskell.packages.ghc914;
+          shell-ghc914 = mkDevShell (pkgs.haskell.packages.ghc914.override {
+            overrides = self: super: {
+              clay = pkgs.haskell.lib.doJailbreak super.clay;
+              #Cabal-syntax_3_14_2_0 = pkgs.haskell.lib.doJailbreak super.Cabal-syntax_3_14_2_0;
+              Cabal-syntax_3_14_2_0 = pkgs.haskell.lib.overrideCabal
+              super.Cabal-syntax_3_14_2_0 (old: {
+              postPatch = (old.postPatch or "") + ''
+                sed -i 's/time\s*>= 1\.4\.0\.1\s*&& < 1\.15/time >=1.4.0.1/' Cabal-syntax.cabal
+                sed -i 's/containers\s*>= 0\.5\.0\.0\s*&& < 0\.8/containers >=0.5.8.0/' Cabal-syntax.cabal
+              '';
+            });
+              Cabal_3_14_2_0 = pkgs.haskell.lib.overrideCabal
+              super.Cabal_3_14_2_0 (old: {
+              postPatch = (old.postPatch or "") + ''
+                sed -i 's/time\s*>= 1\.4\.0\.1\s*&& < 1\.15/time >=1.4.0.1/' Cabal.cabal
+                sed -i 's/containers\s*>= 0\.5\.8\.0\s*&& < 0\.8/containers >=0.5.8.0/' Cabal.cabal
+              '';
+            });
+
+              dec = pkgs.haskell.lib.doJailbreak super.dec;
+              ghc-lib-parser = pkgs.haskell.lib.doJailbreak super.ghc-lib-parser;
+              ghc-trace-events = pkgs.haskell.lib.doJailbreak super.ghc-trace-events;
+              hie-compat = pkgs.haskell.lib.doJailbreak super.hie-compat;
+              lucid = pkgs.haskell.lib.doJailbreak super.lucid;
+              singleton-bool = pkgs.haskell.lib.doJailbreak super.singleton-bool;
+            };
+          });
         };
+
 
         packages = { inherit docs; };
       });
